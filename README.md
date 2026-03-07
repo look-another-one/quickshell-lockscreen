@@ -37,4 +37,3 @@ This project uses Nix Flakes for a reproducible development environment.
 ```bash
 nix develop
 ```
-```
