@@ -30,10 +30,9 @@ Rectangle {
 
 	Image {
 		id: bgImg
-		source: "file:///home/yousaytoday/.gemini/antigravity/brain/2bb05c0b-342b-4fb7-b631-8c1f7be87ea2/lockscreen_bg_1772878389767.png"
+		source: "dark_jungle.jpg"
 		anchors.fill: parent
 		fillMode: Image.PreserveAspectCrop
-		visible: false
 	}
 
 	MultiEffect {
@@ -42,19 +41,15 @@ Rectangle {
 		source: bgImg
 		blurEnabled: true
 		blurMax: 64
-		blur: root.showPassword ? 0.3 : 0.8
-		colorization: 0.2
-		colorizationColor: "black"
-		brightness: root.showPassword ? 0.8 : 0.4
-		
-		Behavior on blur { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
-		Behavior on brightness { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
+		blur: 0.8
+		opacity: root.showPassword ? 0.0 : 1.0
+		Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
 	}
 
 	Rectangle {
 		anchors.fill: parent
 		color: "black"
-		opacity: root.showPassword ? 0.4 : 0.2
+		opacity: root.showPassword ? 0.3 : 0.5
 		Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
 	}
 
@@ -72,8 +67,9 @@ Rectangle {
 			
 			Layout.alignment: Qt.AlignHCenter
 			renderType: Text.NativeRendering
+			font.family: "Impact" // Block-like font
 			font.pointSize: 96
-			font.weight: Font.Thin
+			font.weight: Font.Black
 			color: "white"
 
 			Timer {
@@ -86,7 +82,8 @@ Rectangle {
 			text: {
 				const hours = this.date.getHours().toString().padStart(2, '0');
 				const minutes = this.date.getMinutes().toString().padStart(2, '0');
-				return `${hours}:${minutes}`;
+				const seconds = this.date.getSeconds().toString().padStart(2, '0');
+				return `${hours}:${minutes}:${seconds}`;
 			}
 		}
 		
@@ -156,7 +153,7 @@ Rectangle {
 
 			RowLayout {
 				Layout.alignment: Qt.AlignHCenter
-				visible: passwordBox.text.length > 0 && passwordBox.text !== passwordBox.text.toLowerCase() && (Qt.keyboard.modifiers & Qt.ShiftModifier) === 0
+				visible: passwordBox.text.length > 0 && passwordBox.text !== passwordBox.text.toLowerCase() && !passwordBox.shiftDown
 				opacity: visible ? 1 : 0
 				Behavior on opacity { NumberAnimation { duration: 300 } }
 				
@@ -208,6 +205,14 @@ Rectangle {
 					selectionColor: "#80FFFFFF"
 					enabled: !root.context.unlockInProgress
 					inputMethodHints: Qt.ImhSensitiveData
+
+					property bool shiftDown: false
+					Keys.onPressed: (event) => {
+						if (event.key === Qt.Key_Shift) shiftDown = true;
+					}
+					Keys.onReleased: (event) => {
+						if (event.key === Qt.Key_Shift) shiftDown = false;
+					}
 
 					Rectangle {
 						anchors.centerIn: parent
@@ -281,6 +286,7 @@ Rectangle {
 			id: pBtn
 			property string iconText: "?"
 			property string tooltip: ""
+			signal click()
 			
 			width: 50; height: 50
 			radius: 25
@@ -306,7 +312,7 @@ Rectangle {
 				anchors.fill: parent
 				hoverEnabled: true
 				cursorShape: Qt.PointingHandCursor
-				onClicked: console.log(pBtn.tooltip + " clicked") 
+				onClicked: pBtn.click()
 			}
 
 			Rectangle {
@@ -331,8 +337,10 @@ Rectangle {
 			}
 		}
 
-		PowerButton { iconText: "☾"; tooltip: "Sleep" }
-		PowerButton { iconText: "↻"; tooltip: "Restart" }
-		PowerButton { iconText: "⏻"; tooltip: "Shutdown" }
+		PowerButton { iconText: "⏻"; tooltip: "Shutdown"; onClick: root.context.shutdown() }
+		PowerButton { iconText: "❄"; tooltip: "Hibernate"; onClick: root.context.hibernate() }
+		PowerButton { iconText: "☾"; tooltip: "Sleep"; onClick: root.context.sleep() }
+		PowerButton { iconText: "↻"; tooltip: "Restart"; onClick: root.context.restart() }
+		PowerButton { iconText: "➜"; tooltip: "Logout"; onClick: root.context.logout() }
 	}
 }

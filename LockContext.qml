@@ -23,6 +23,23 @@ Scope {
 		pam.start();
 	}
 
+	// Action templates for power buttons
+	function shutdown() {
+		console.log("TODO: Execute shutdown command");
+	}
+	function hibernate() {
+		console.log("TODO: Execute hibernate command");
+	}
+	function sleep() {
+		console.log("TODO: Execute sleep command");
+	}
+	function restart() {
+		console.log("TODO: Execute restart command");
+	}
+	function logout() {
+		console.log("TODO: Execute logout command");
+	}
+
 	PamContext {
 		id: pam
 
