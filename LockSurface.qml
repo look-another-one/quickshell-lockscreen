@@ -174,18 +174,75 @@ Rectangle {
 			}
 
 			Item {
-				Layout.preferredWidth: 320
-				Layout.preferredHeight: 60
+				Layout.preferredWidth: Math.max(300, 60 + passwordBox.text.length * 40)
+				Layout.preferredHeight: 70
 				Layout.alignment: Qt.AlignHCenter
+				Behavior on Layout.preferredWidth { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
+
+				// Outer base for 3D extrusion/press effect (Neumorphism)
+				Rectangle {
+					anchors.fill: parent
+					radius: 35
+					color: "#2C2F33" // Slightly muted dark base
+					
+					border.color: root.context.showFailure ? "#FF5252" : (passwordBox.activeFocus ? "#40444A" : "#303338")
+					border.width: 1
+
+					// Dark top/left inner shadow (the "pressed-in" indent)
+					MultiEffect {
+						anchors.fill: parent
+						source: Rectangle { width: parent.width; height: parent.height; radius: 35; color: "black" }
+						shadowEnabled: true
+						shadowColor: "#80000000" // Intense black shadow
+						shadowHorizontalOffset: 4
+						shadowVerticalOffset: 4
+						shadowBlur: 0.5
+						visible: true
+					}
+
+					// Light bottom/right highlight (the light catching the bottom edge)
+					MultiEffect {
+						anchors.fill: parent
+						source: Rectangle { width: parent.width; height: parent.height; radius: 35; color: "white" }
+						shadowEnabled: true
+						shadowColor: "#1FFFFFFF" // Faint white highlight
+						shadowHorizontalOffset: -2
+						shadowVerticalOffset: -2
+						shadowBlur: 0.5
+						visible: true
+					}
+					
+					// Focus glow overlay
+					Rectangle {
+						anchors.fill: parent
+						radius: 35
+						color: "transparent"
+						border.color: "white"
+						border.width: 2
+						opacity: passwordBox.activeFocus ? 0.1 : 0
+						Behavior on opacity { NumberAnimation { duration: 300 } }
+					}
+
+					// Failure glow overlay
+					Rectangle {
+						anchors.fill: parent
+						radius: 35
+						color: "transparent"
+						border.color: "#FF5252"
+						border.width: 2
+						opacity: root.context.showFailure ? 1 : 0
+						Behavior on opacity { NumberAnimation { duration: 300 } }
+					}
+				}
 
 				TextInput {
 					id: passwordBox
 					anchors.fill: parent
-					anchors.bottomMargin: 10
+					anchors.margins: 15
 					horizontalAlignment: Text.AlignHCenter
 					verticalAlignment: Text.AlignVCenter
 					color: "white"
-					font.pointSize: 42
+					font.pointSize: 32
 					echoMode: TextInput.Password
 					passwordCharacter: "●"
 					selectionColor: "#80FFFFFF"
@@ -210,33 +267,6 @@ Rectangle {
 								passwordBox.text = root.context.currentText;
 							}
 						}
-					}
-				}
-
-				// Sleek minimalist glowing underline
-				Rectangle {
-					anchors.bottom: parent.bottom
-					anchors.horizontalCenter: parent.horizontalCenter
-					width: passwordBox.activeFocus ? parent.width : parent.width * 0.3
-					height: root.context.showFailure ? 3 : 2
-					radius: 1
-					color: root.context.showFailure ? "#FF5252" : (passwordBox.activeFocus ? "white" : "#80FFFFFF")
-					
-					Behavior on width { NumberAnimation { duration: 450; easing.type: Easing.OutExpo } }
-					Behavior on color { ColorAnimation { duration: 300 } }
-
-					Rectangle {
-						anchors.fill: parent
-						radius: 1
-						color: parent.color
-						layer.enabled: true
-						layer.effect: MultiEffect {
-							blurEnabled: true
-							blurMax: 24
-							blur: 1.0
-						}
-						opacity: passwordBox.activeFocus || root.context.showFailure ? 1.0 : 0.0
-						Behavior on opacity { NumberAnimation { duration: 300 } }
 					}
 				}
 			}
