@@ -1,4 +1,4 @@
-```markdown
+
 # QuickShell Lockscreen
 
 > [!WARNING]
