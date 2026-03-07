@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pam
+import Quickshell.Io
 
 Scope {
 	id: root
@@ -23,21 +24,32 @@ Scope {
 		pam.start();
 	}
 
+	// Process components for power actions
+	Process { id: shutdownProc; command: ["systemctl", "poweroff"] }
+	Process { id: hibernateProc; command: ["systemctl", "hibernate"] }
+	Process { id: sleepProc; command: ["systemctl", "suspend"] }
+	Process { id: restartProc; command: ["systemctl", "reboot"] }
+	Process { id: logoutProc; command: ["pkill", "niri"] }
+
 	// Action templates for power buttons
 	function shutdown() {
-		console.log("TODO: Execute shutdown command");
+		shutdownProc.running = true;
 	}
+
 	function hibernate() {
-		console.log("TODO: Execute hibernate command");
+		hibernateProc.running = true;
 	}
+
 	function sleep() {
-		console.log("TODO: Execute sleep command");
+		sleepProc.running = true;
 	}
+
 	function restart() {
-		console.log("TODO: Execute restart command");
+		restartProc.running = true;
 	}
+
 	function logout() {
-		console.log("TODO: Execute logout command");
+		logoutProc.running = true;
 	}
 
 	PamContext {

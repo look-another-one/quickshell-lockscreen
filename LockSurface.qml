@@ -108,7 +108,7 @@ Rectangle {
 		font.pointSize: 16
 		font.weight: Font.Light
 		opacity: root.showPassword ? 0 : 0.8
-		Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.OutQuadratic } }
+		Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.OutQuad } }
 		
 		SequentialAnimation on opacity {
 			running: !root.showPassword
@@ -153,7 +153,12 @@ Rectangle {
 
 			RowLayout {
 				Layout.alignment: Qt.AlignHCenter
-				visible: passwordBox.text.length > 0 && passwordBox.text !== passwordBox.text.toLowerCase() && !passwordBox.shiftDown
+				// Heuristic: If we type an uppercase letter while Shift is NOT pressed, Caps Lock must be ON.
+				property bool isCapsActive: passwordBox.text.length > 0 && 
+											/[A-Z]/.test(passwordBox.text.charAt(passwordBox.text.length - 1)) && 
+											!passwordBox.shiftDown
+
+				visible: isCapsActive
 				opacity: visible ? 1 : 0
 				Behavior on opacity { NumberAnimation { duration: 300 } }
 				
