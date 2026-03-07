@@ -24,33 +24,6 @@ Scope {
 		pam.start();
 	}
 
-	// Process components for power actions
-	Process { id: shutdownProc; command: ["systemctl", "poweroff"] }
-	Process { id: hibernateProc; command: ["systemctl", "hibernate"] }
-	Process { id: sleepProc; command: ["systemctl", "suspend"] }
-	Process { id: restartProc; command: ["systemctl", "reboot"] }
-	Process { id: logoutProc; command: ["pkill", "niri"] }
-
-	// Action templates for power buttons
-	function shutdown() {
-		shutdownProc.running = true;
-	}
-
-	function hibernate() {
-		hibernateProc.running = true;
-	}
-
-	function sleep() {
-		sleepProc.running = true;
-	}
-
-	function restart() {
-		restartProc.running = true;
-	}
-
-	function logout() {
-		logoutProc.running = true;
-	}
 
 	PamContext {
 		id: pam

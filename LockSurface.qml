@@ -173,38 +173,19 @@ Rectangle {
 				}
 			}
 
-			Rectangle {
-				id: inputBg
-				Layout.preferredWidth: Math.max(250, 40 + passwordBox.text.length * 40)
+			Item {
+				Layout.preferredWidth: 320
 				Layout.preferredHeight: 60
 				Layout.alignment: Qt.AlignHCenter
-				radius: 30
-				color: passwordBox.activeFocus ? "#30FFFFFF" : "#15FFFFFF"
-				border.color: passwordBox.activeFocus ? "#80FFFFFF" : "#30FFFFFF"
-				border.width: root.context.showFailure ? 2 : 1
-				
-				Rectangle {
-					anchors.fill: parent
-					radius: parent.radius
-					color: "transparent"
-					border.color: "#FF5252"
-					border.width: 2
-					opacity: root.context.showFailure ? 1 : 0
-					Behavior on opacity { NumberAnimation { duration: 300 } }
-				}
-
-				Behavior on Layout.preferredWidth { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
-				Behavior on color { ColorAnimation { duration: 300 } }
-				Behavior on border.color { ColorAnimation { duration: 300 } }
 
 				TextInput {
 					id: passwordBox
 					anchors.fill: parent
-					anchors.margins: 10
+					anchors.bottomMargin: 10
 					horizontalAlignment: Text.AlignHCenter
 					verticalAlignment: Text.AlignVCenter
 					color: "white"
-					font.pointSize: 24
+					font.pointSize: 42
 					echoMode: TextInput.Password
 					passwordCharacter: "●"
 					selectionColor: "#80FFFFFF"
@@ -219,20 +200,6 @@ Rectangle {
 						if (event.key === Qt.Key_Shift) shiftDown = false;
 					}
 
-					Rectangle {
-						anchors.centerIn: parent
-						width: parent.width + 10
-						height: parent.height + 10
-						radius: 35
-						color: "transparent"
-						border.color: "white"
-						border.width: 1
-						opacity: parent.activeFocus ? 0.3 : 0
-						scale: parent.activeFocus ? 1.0 : 0.95
-						Behavior on opacity { NumberAnimation { duration: 400 } }
-						Behavior on scale { NumberAnimation { duration: 400; easing.type: Easing.OutBack } }
-					}
-
 					onTextChanged: root.context.currentText = this.text;
 					onAccepted: root.context.tryUnlock();
 
@@ -243,6 +210,33 @@ Rectangle {
 								passwordBox.text = root.context.currentText;
 							}
 						}
+					}
+				}
+
+				// Sleek minimalist glowing underline
+				Rectangle {
+					anchors.bottom: parent.bottom
+					anchors.horizontalCenter: parent.horizontalCenter
+					width: passwordBox.activeFocus ? parent.width : parent.width * 0.3
+					height: root.context.showFailure ? 3 : 2
+					radius: 1
+					color: root.context.showFailure ? "#FF5252" : (passwordBox.activeFocus ? "white" : "#80FFFFFF")
+					
+					Behavior on width { NumberAnimation { duration: 450; easing.type: Easing.OutExpo } }
+					Behavior on color { ColorAnimation { duration: 300 } }
+
+					Rectangle {
+						anchors.fill: parent
+						radius: 1
+						color: parent.color
+						layer.enabled: true
+						layer.effect: MultiEffect {
+							blurEnabled: true
+							blurMax: 24
+							blur: 1.0
+						}
+						opacity: passwordBox.activeFocus || root.context.showFailure ? 1.0 : 0.0
+						Behavior on opacity { NumberAnimation { duration: 300 } }
 					}
 				}
 			}
@@ -279,73 +273,5 @@ Rectangle {
 		}
 	}
 
-	RowLayout {
-		anchors {
-			bottom: parent.bottom
-			right: parent.right
-			margins: 40
-		}
-		spacing: 20
 
-		component PowerButton: Rectangle {
-			id: pBtn
-			property string iconText: "?"
-			property string tooltip: ""
-			signal click()
-			
-			width: 50; height: 50
-			radius: 25
-			color: ma.containsMouse ? "#40FFFFFF" : "#1AFFFFFF"
-			border.color: ma.containsMouse ? "#80FFFFFF" : "#30FFFFFF"
-			border.width: 1
-
-			Behavior on color { ColorAnimation { duration: 200 } }
-			Behavior on border.color { ColorAnimation { duration: 200 } }
-			Behavior on scale { NumberAnimation { duration: 150 } }
-			
-			scale: ma.pressed ? 0.9 : (ma.containsMouse ? 1.1 : 1.0)
-
-			Label {
-				anchors.centerIn: parent
-				text: pBtn.iconText
-				color: "white"
-				font.pointSize: 18
-			}
-
-			MouseArea {
-				id: ma
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: pBtn.click()
-			}
-
-			Rectangle {
-				width: tooltipLabel.width + 20
-				height: tooltipLabel.height + 14
-				anchors.bottom: pBtn.top
-				anchors.bottomMargin: 10
-				anchors.horizontalCenter: pBtn.horizontalCenter
-				color: "#A0000000"
-				radius: 8
-				opacity: ma.containsMouse ? 1 : 0
-				visible: opacity > 0
-				Behavior on opacity { NumberAnimation { duration: 200 } }
-
-				Label {
-					id: tooltipLabel
-					anchors.centerIn: parent
-					text: pBtn.tooltip
-					color: "white"
-					font.pointSize: 11
-				}
-			}
-		}
-
-		PowerButton { iconText: "⏻"; tooltip: "Shutdown"; onClick: root.context.shutdown() }
-		PowerButton { iconText: "❄"; tooltip: "Hibernate"; onClick: root.context.hibernate() }
-		PowerButton { iconText: "☾"; tooltip: "Sleep"; onClick: root.context.sleep() }
-		PowerButton { iconText: "↻"; tooltip: "Restart"; onClick: root.context.restart() }
-		PowerButton { iconText: "➜"; tooltip: "Logout"; onClick: root.context.logout() }
-	}
 }
