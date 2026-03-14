@@ -174,80 +174,68 @@ Rectangle {
 			}
 
 			Item {
-				Layout.preferredWidth: Math.max(300, 60 + passwordBox.text.length * 40)
-				Layout.preferredHeight: 70
+				Layout.preferredWidth: Math.max(160, 80 + passwordBox.text.length * 40)
+				Layout.preferredHeight: 80
 				Layout.alignment: Qt.AlignHCenter
 				Behavior on Layout.preferredWidth { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
 
-				// Outer base for 3D extrusion/press effect (Neumorphism)
+				// Left Bracket
 				Rectangle {
-					anchors.fill: parent
-					radius: 35
-					color: "#2C2F33" // Slightly muted dark base
-					
-					border.color: root.context.showFailure ? "#FF5252" : (passwordBox.activeFocus ? "#40444A" : "#303338")
-					border.width: 1
-
-					// Dark top/left inner shadow (the "pressed-in" indent)
-					MultiEffect {
-						anchors.fill: parent
-						source: Rectangle { width: parent.width; height: parent.height; radius: 35; color: "black" }
-						shadowEnabled: true
-						shadowColor: "#80000000" // Intense black shadow
-						shadowHorizontalOffset: 4
-						shadowVerticalOffset: 4
-						shadowBlur: 0.5
-						visible: true
-					}
-
-					// Light bottom/right highlight (the light catching the bottom edge)
-					MultiEffect {
-						anchors.fill: parent
-						source: Rectangle { width: parent.width; height: parent.height; radius: 35; color: "white" }
-						shadowEnabled: true
-						shadowColor: "#1FFFFFFF" // Faint white highlight
-						shadowHorizontalOffset: -2
-						shadowVerticalOffset: -2
-						shadowBlur: 0.5
-						visible: true
-					}
-					
-					// Focus glow overlay
+					anchors.left: parent.left
+					anchors.verticalCenter: parent.verticalCenter
+					width: 20
+					height: parent.height
+					color: "transparent"
+					border.color: root.context.showFailure ? "#FF5252" : (passwordBox.activeFocus ? "#FFFFFF" : "#80FFFFFF")
+					border.width: 3
+					radius: 10
+					// Hide the right side of the border to make a "[" shape
 					Rectangle {
-						anchors.fill: parent
-						radius: 35
-						color: "transparent"
-						border.color: "white"
-						border.width: 2
-						opacity: passwordBox.activeFocus ? 0.1 : 0
-						Behavior on opacity { NumberAnimation { duration: 300 } }
+						anchors.right: parent.right
+						anchors.top: parent.top
+						anchors.bottom: parent.bottom
+						width: 10
+						color: "black" // Match background to hide the border smoothly
+						opacity: root.showPassword ? 0.3 : 0.5 // Match the underlying semi-transparent overlay
 					}
-
-					// Failure glow overlay
+					Behavior on border.color { ColorAnimation { duration: 300 } }
+				}
+				
+				// Right Bracket
+				Rectangle {
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					width: 20
+					height: parent.height
+					color: "transparent"
+					border.color: root.context.showFailure ? "#FF5252" : (passwordBox.activeFocus ? "#FFFFFF" : "#80FFFFFF")
+					border.width: 3
+					radius: 10
+					// Hide the left side of the border to make a "]" shape
 					Rectangle {
-						anchors.fill: parent
-						radius: 35
-						color: "transparent"
-						border.color: "#FF5252"
-						border.width: 2
-						opacity: root.context.showFailure ? 1 : 0
-						Behavior on opacity { NumberAnimation { duration: 300 } }
+						anchors.left: parent.left
+						anchors.top: parent.top
+						anchors.bottom: parent.bottom
+						width: 10
+						color: "black"
+						opacity: root.showPassword ? 0.3 : 0.5
 					}
+					Behavior on border.color { ColorAnimation { duration: 300 } }
 				}
 
 				TextInput {
 					id: passwordBox
 					anchors.fill: parent
-					anchors.margins: 15
 					horizontalAlignment: Text.AlignHCenter
 					verticalAlignment: Text.AlignVCenter
-					color: "white"
-					font.pointSize: 32
+					color: root.context.showFailure ? "#FF5252" : "white"
+					font.pointSize: 42
 					echoMode: TextInput.Password
 					passwordCharacter: "●"
 					selectionColor: "#80FFFFFF"
 					enabled: !root.context.unlockInProgress
 					inputMethodHints: Qt.ImhSensitiveData
+					cursorDelegate: Item {}
 
 					property bool shiftDown: false
 					Keys.onPressed: (event) => {
